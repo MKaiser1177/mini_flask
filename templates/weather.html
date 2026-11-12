@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} Weather</title>
+    <link href="{{ url_for('static', filename='styles/styles.css') }}" rel="stylesheet" />
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <noscript>
+            <div class="weather-card">
+                <h1>{{ title }} Weather</h1>
+                <p>{{ status }} and {{ temp }} &deg;</p>
+                <p>Feels like {{ feels_like }} &deg;</p>
+                <form action="/weather">
+                    <input type="text" name="city" id="city" placeholder="Enter a City" />
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </noscript>
+    </div>
+
+    <script type="text/babel">
+        function App() {
+            const [city, setCity] = React.useState("");
+            const weatherTitle = {{ title|tojson }};
+            const weatherStatus = {{ status|tojson }};
+            const weatherTemp = {{ temp|tojson }};
+            const weatherFeelsLike = {{ feels_like|tojson }};
+
+            const getWeatherIcon = (status) => {
+                const s = (status || "").toLowerCase();
+                if (s.includes("cloud")) {
+                    return (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+                        </svg>
+                    );
+                }
+                if (s.includes("rain") || s.includes("drizzle")) {
+                    return (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="16" y1="13" x2="16" y2="21" />
+                            <line x1="8" y1="13" x2="8" y2="21" />
+                            <line x1="12" y1="15" x2="12" y2="23" />
+                            <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25" />
+                        </svg>
+                    );
+                }
+                if (s.includes("snow")) {
+                    return (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="2" x2="12" y2="22" />
+                            <line x1="2" y1="12" x2="22" y2="12" />
+                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                            <line x1="19.07" y1="4.93" x2="4.93" y2="19.07" />
+                        </svg>
+                    );
+                }
+                if (s.includes("thunder") || s.includes("storm")) {
+                    return (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                        </svg>
+                    );
+                }
+                return (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                );
+            };
+
+            return (
+                <div className="weather-card">
+                    <div className="app-header">
+                        <div className="weather-icon-badge">
+                            {getWeatherIcon(weatherStatus)}
+                        </div>
+                        <h1 className="app-title">{weatherTitle}</h1>
+                        <p className="weather-status">{weatherStatus}</p>
+                    </div>
+
+                    <div className="weather-display">
+                        <div className="temp-huge">
+                            {weatherTemp}<span className="temp-unit">&deg;C</span>
+                        </div>
+                        <div className="weather-details-grid">
+                            <div className="detail-tile">
+                                <span className="detail-label">Condition</span>
+                                <span className="detail-value">{weatherStatus}</span>
+                            </div>
+                            <div className="detail-tile">
+                                <span className="detail-label">Feels Like</span>
+                                <span className="detail-value">{weatherFeelsLike}&deg;C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form action="/weather" method="GET" className="weather-form">
+                        <input
+                            type="text"
+                            name="city"
+                            id="city"
+                            className="weather-input"
+                            placeholder="Check another city..."
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            required
+                        />
+                        <button type="submit" className="weather-btn">
+                            Search
+                        </button>
+                    </form>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
